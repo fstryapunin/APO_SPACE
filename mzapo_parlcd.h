@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+void parlcd_write_cr(unsigned char *parlcd_mem_base, uint16_t data);
+
 void parlcd_write_cmd(unsigned char *parlcd_mem_base, uint16_t cmd);
 
 void parlcd_write_data(unsigned char *parlcd_mem_base, uint16_t data);

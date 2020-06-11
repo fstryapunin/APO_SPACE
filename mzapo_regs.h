@@ -45,6 +45,8 @@
 #define PARLCD_REG_BASE_PHYS  0x43c00000
 #define PARLCD_REG_SIZE       0x00004000
 
+#define PARLCD_REG_CR_o                 0x0000
+#define PARLCD_REG_CR_RESET_m                  0x00000010
 #define PARLCD_REG_CMD_o                0x0008
 #define PARLCD_REG_DATA_o               0x000C
 

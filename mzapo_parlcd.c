@@ -23,6 +23,11 @@
 #include "mzapo_parlcd.h"
 #include "mzapo_regs.h"
 
+void parlcd_write_cr(unsigned char *parlcd_mem_base, uint16_t data)
+{
+  *(volatile uint16_t*)(parlcd_mem_base + PARLCD_REG_CR_o) = data;
+}
+
 void parlcd_write_cmd(unsigned char *parlcd_mem_base, uint16_t cmd)
 {
   *(volatile uint16_t*)(parlcd_mem_base + PARLCD_REG_CMD_o) = cmd;

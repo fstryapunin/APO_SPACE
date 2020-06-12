@@ -38,15 +38,15 @@ LDFLAGS += $(CXXFLAGS) $(CPPFLAGS)
 endif
 
 %.o:%.c
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
 
 all: $(TARGET_EXE)
 
 $(TARGET_EXE): $(OBJECTS)
-	$(LINKER) $(LDFLAGS) -L. $^ -o $@
+	$(LINKER) $(LDFLAGS) -L. $^ -o $@ $(LDLIBS)
 
 .PHONY : dep all run copy-executable debug
 

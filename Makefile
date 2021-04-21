@@ -39,10 +39,10 @@ LDFLAGS += $(CXXFLAGS) $(CPPFLAGS)
 endif
 
 %.o:%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 %.o:%.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 all: $(TARGET_EXE)
 

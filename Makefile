@@ -5,6 +5,7 @@ CPPFLAGS = -I .
 CFLAGS =-g -std=gnu99 -O1 -Wall
 CXXFLAGS = -g -std=gnu++11 -O1 -Wall
 #LDFLAGS +=
+LDFLAGS += -static
 LDLIBS += -lrt -lpthread
 #LDLIBS += -lm
 

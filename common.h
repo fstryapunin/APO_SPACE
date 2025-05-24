@@ -3,5 +3,6 @@ typedef struct
     int x;
     int y;
     int radius;
-    int is_home;
+    bool is_visited;
+    bool is_home;
 } Planet;

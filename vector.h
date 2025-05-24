@@ -5,4 +5,4 @@ typedef struct
 } Vector;
 
 double get_distance(Vector a, Vector b);
-void rotate(Vector vector, Vector rotated_vector);
+Vector rotate(Vector vector, double theta_rad);

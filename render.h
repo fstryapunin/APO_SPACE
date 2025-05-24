@@ -9,6 +9,6 @@ enum MenuState
     PAUSE
 };
 
-void render_state(int fuel, int rotation, int player_x, int player_y, bool is_stopped, bool is_crashed, Planet *planets);
-void render_map(int player_x, int player_y, Planet *planets);
+void render_state(int fuel, int rotation, Vector position, bool is_stopped, bool is_crashed, Planet *planets);
+void render_map(Vector position, Planet *planets);
 void render_menu(MenuState state);

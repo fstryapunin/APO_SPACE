@@ -26,7 +26,7 @@ typedef struct
     int current_planet_index;
     int remaining_fuel;
     int score;
-    Planet *planets;
+    Planet planets[MAX_PLANETS];
     unsigned short planet_count;
 } GameState;
 

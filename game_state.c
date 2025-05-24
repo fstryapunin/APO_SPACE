@@ -14,15 +14,15 @@ PlayerState get_player_state(GameState *state, int *collision_planet_index){
         {
             Vector collision_point_relative_vector = rotate_vector(collision_points[colision_point_index], state->rotation_radians);
             Vector collision_point_coordinates = add_vectors(state->position, collision_point_relative_vector);
-            double distance = get_distance(state->planets[planet_index].position, collision_point_coordinates);
+            double distance = get_distance(state->planets[planet_index].position, collision_point_coordinates) - state->planets[planet_index].radius;
             double speed_magnitude = get_magnitude_from_vector(state->speed);
 
-            if(colision_point_index == LANDING_COLLISION_POINT_START_INDEX && distance < DISTANCE_TRESHOLD_FOR_LANDING && speed_magnitude < SPEED_TRESHOLD_FOR_LANDING)
+            if(colision_point_index == LANDING_COLLISION_POINT_START_INDEX && distance < (DISTANCE_TRESHOLD_FOR_LANDING) && speed_magnitude < SPEED_TRESHOLD_FOR_LANDING)
             {
                 *collision_planet_index = planet_index;
                 return LANDED;
             }
-            if(distance < state->planets[planet_index].radius){
+            if(distance < 0){
                 *collision_planet_index = planet_index;
                 return CRASHED;
             }

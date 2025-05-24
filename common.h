@@ -6,7 +6,7 @@
 typedef struct
 {
     Vector position;
-    int radius;
+    double radius;
     bool is_visited;
     bool is_home;
 } Planet;

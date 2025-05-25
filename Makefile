@@ -9,7 +9,7 @@ LDFLAGS += -static
 LDLIBS += -lrt -lpthread
 LDLIBS += -lm
 
-SOURCES = apo_space.c game_state.c vector.c input.c mzapo_phys.c mzapo_parlcd.c
+SOURCES = apo_space.c game_state.c vector.c input.c render.c mzapo_phys.c mzapo_parlcd.c
 #SOURCES += font_prop14x16.c font_rom8x16.c
 TARGET_EXE = apo_space
 TARGET_IP ?= 192.168.136.110

@@ -1,6 +1,6 @@
 #include "common.h"
 #define LED_COUNT 32
-#define PIXELS_PER_METER_IN_GAME 10
+#define PIXELS_PER_METER_IN_GAME 3
 #define PIXELS_PER_METER_IN_MAP 0.1f
 #define RENDER_DELAY_MS 20
 #define LCD_WIDTH 480

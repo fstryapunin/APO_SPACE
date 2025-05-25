@@ -33,12 +33,25 @@ void draw_circle(unsigned short *buffer, int center_x, int center_y, int pixel_r
     }
 }
 
+void draw_planets(unsigned short *buffer, Planet *planets, int planet_count, Vector player_position){
+    for(int planet_index = 0; planet_index < planet_count; planet_index++){
+        Planet planet = planets[planet_index];
+        if(
+            fabs(player_position.x - planet.position.x - planet.radius) * PIXELS_PER_METER_IN_GAME <= LCD_WIDTH
+            && fabs(player_position.y - planet.position.y - planet.radius) * PIXELS_PER_METER_IN_GAME <= LCD_HEIGHT
+        ){
+            Vector relative = multiply_vector_by_scalar((planet.position, player_position), PIXELS_PER_METER_IN_GAME);
+            draw_circle(buffer, relative.x, relative.y, planet.radius * PIXELS_PER_METER_IN_GAME, WHITE_COLOR);
+        }
+    }
+};
+
 void *loop_render(RenderArgs *args){
     void *parlcd_mem_base = map_phys_address(PARLCD_REG_BASE_PHYS, PARLCD_REG_SIZE, 0);
     unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
     parlcd_hx8357_init(parlcd_mem_base);
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
-    draw_circle(frame_buffer, 100, 100, 50, WHITE_COLOR);
+    draw_planets(frame_buffer, args->planets, args->planet_count, *(args->position));
     while (!args->stop)
     {
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);

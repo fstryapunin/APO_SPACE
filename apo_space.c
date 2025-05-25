@@ -28,6 +28,7 @@
 #include "game_state.h"
 #include "input.h"
 #include "io.h"
+#include "render.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 
   pthread_t game_thread;
   pthread_t input_thread;
+  pthread_t render_thread;
 
   printf("Hello world\n");
 
@@ -45,10 +47,20 @@ int main(int argc, char *argv[])
 
   GameStateArgs game_state_args = { &state, &(input.acceleration_input), &(input.rotation_input), false };
   InputArgs input_args = { &input, false, memory_base };
-  
-  //pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
+  RenderArgs render_args = { 
+    &(state.remaining_fuel), 
+    &(state.rotation_radians),
+    &(state.position),
+    &(state.player_state),
+    &(state.planets),
+    &(state.planet_count),
+    false
+  };
 
-  pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
+  //pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
+  //pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
+  pthread_create(&render_thread, NULL, loop_render, &render_args);
+
 
   sleep(100);
 

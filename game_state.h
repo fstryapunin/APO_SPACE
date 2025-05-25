@@ -8,6 +8,7 @@
 #define PLAYER_WIDTH 2
 #define PLAYER_HEIGHT 4 
 #define SCORE_REWARD 100
+#define UPDATE_DELAY_MS 1000
 
 typedef enum PlayerState 
 {
@@ -30,5 +31,13 @@ typedef struct
     unsigned short planet_count;
 } GameState;
 
-void init_gamestate(GameState *state);
-void update_gamestate(GameState *state, double steering_set_point_radians, int acceleration_input);
+typedef struct {
+    GameState *state;
+    double *acceration;
+    double *rotation;
+    bool stop;
+} GameStateArgs;
+
+GameState init_gamestate();
+//void update_gamestate(GameState *state, double steering_set_point_radians, int acceleration_input);
+void *loop_game_state(GameStateArgs *args);

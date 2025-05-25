@@ -6,12 +6,6 @@
 #define GREEN_KNOB_BITWISE_OFFSET 16
 #define KNOB_MAX_VALUE 255
 
-void *init_memory(){
-    void *base =  map_phys_address(SPILED_REG_BASE_PHYS, SPILED_REG_SIZE, 0);
-    if (base == NULL) exit(1);
-    return base;
-}
-
 Input init_input(){
     return (Input){ 0, 0, false, false};
 }
@@ -38,10 +32,9 @@ void get_input(Input *input, unsigned char *mem_base){
 };
 
 void *loop_input_collection(InputArgs *args){
-    unsigned char *mem_base = init_memory();
     while (!args->stop)
     {
-        get_input(args->input, mem_base);
+        get_input(args->input, args->mem_base);
         printf("Input acc: %lf rot: %lf pause: %d, map: %d\n", 
             args->input->acceleration_input, 
             args->input->rotation_input,

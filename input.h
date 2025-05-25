@@ -14,6 +14,7 @@ typedef struct
 {
     Input *input;
     bool stop;
+    unsigned char *mem_base;
 } InputArgs;
 
 

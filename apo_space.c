@@ -27,10 +27,15 @@
 #include "mzapo_regs.h"
 #include "game_state.h"
 #include "input.h"
+#include "io.h"
 
 int main(int argc, char *argv[])
 {
+  unsigned char *memory_base = (unsigned char *)init_memory();
+
   pthread_t game_thread;
+  pthread_t input_thread;
+
   printf("Hello world\n");
 
   Input input = init_input();
@@ -38,15 +43,20 @@ int main(int argc, char *argv[])
  
   GameState state = init_gamestate();
 
-  GameStateArgs args = { &state, &(input.acceleration_input), &(input.rotation_input) };
+  GameStateArgs game_state_args = { &state, &(input.acceleration_input), &(input.rotation_input), false };
+  InputArgs input_args = { &input, false, memory_base };
   
-  pthread_create(&game_thread, NULL, loop_game_state, &args);
+  //pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
 
-  sleep(10);
+  pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
 
-  args.stop = true;
+  sleep(100);
 
-  pthread_join(game_thread, NULL);
+  game_state_args.stop = true;
+  input_args.stop = true;
+
+  // pthread_join(game_thread, NULL);
+  pthread_join(input_thread, NULL);
 
   printf("Bye world\n");
 

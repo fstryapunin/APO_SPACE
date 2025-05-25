@@ -20,36 +20,35 @@
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "mzapo_parlcd.h"
 #include "mzapo_phys.h"
 #include "mzapo_regs.h"
-#include "serialize_lock.h"
+#include "game_state.h"
+#include "input.h"
 
 int main(int argc, char *argv[])
 {
-
-  /* Serialize execution of applications */
-
-  /* Try to acquire lock the first */
-  if (serialize_lock(1) <= 0) {
-    printf("System is occupied\n");
-
-    if (1) {
-      printf("Waitting\n");
-      /* Wait till application holding lock releases it or exits */
-      serialize_lock(0);
-    }
-  }
-
+  pthread_t game_thread;
   printf("Hello world\n");
 
-  sleep(4);
+  Input input = init_input();
+  input.acceleration_input = 100;
+ 
+  GameState state = init_gamestate();
 
-  printf("Goodbye world\n");
+  GameStateArgs args = { &state, &(input.acceleration_input), &(input.rotation_input) };
+  
+  pthread_create(&game_thread, NULL, loop_game_state, &args);
 
-  /* Release the lock */
-  serialize_unlock();
+  sleep(10);
+
+  args.stop = true;
+
+  pthread_join(game_thread, NULL);
+
+  printf("Bye world\n");
 
   return 0;
 }

@@ -7,12 +7,12 @@ CXXFLAGS = -g -std=gnu++11 -O1 -Wall
 #LDFLAGS +=
 LDFLAGS += -static
 LDLIBS += -lrt -lpthread
-#LDLIBS += -lm
+LDLIBS += -lm
 
-SOURCES = change_me.c mzapo_phys.c mzapo_parlcd.c
+SOURCES = apo_space.c game_state.c vector.c input.c mzapo_phys.c mzapo_parlcd.c
 #SOURCES += font_prop14x16.c font_rom8x16.c
-TARGET_EXE = change_me
-#TARGET_IP ?= 192.168.202.127
+TARGET_EXE = apo_space
+TARGET_IP ?= 192.168.136.110
 ifeq ($(TARGET_IP),)
 ifneq ($(filter debug run,$(MAKECMDGOALS)),)
 $(warning The target IP address is not set)
@@ -25,7 +25,7 @@ TARGET_USER ?= root
 # for use from Eduroam network use TARGET_IP=localhost and enable next line
 #SSH_OPTIONS=-o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" -o "Port=2222"
 #SSH_GDB_TUNNEL_REQUIRED=y
-#SSH_OPTIONS=-i /opt/zynq/ssh-connect/mzapo-root-key
+SSH_OPTIONS=-i /opt/zynq/ssh-connect/mzapo-root-key
 #SSH_OPTIONS=-o 'ProxyJump=ctu_login@postel.felk.cvut.cz'
 
 OBJECTS += $(filter %.o,$(SOURCES:%.c=%.o))

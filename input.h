@@ -1,16 +1,16 @@
-enum ButtonState 
+typedef enum ButtonState 
 {
     HIGH = 0,
     LOW = 1
-};
+} ButtonState;
 
 typedef struct
 {
-    int acceleration_input;
-    int rotation_input;
+    double acceleration_input;
+    double rotation_input;
     ButtonState pause_input;
     ButtonState map_input;
 } Input;
 
-void init_input(Input *Input);
+Input init_input();
 void get_input(Input *Input);

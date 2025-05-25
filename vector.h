@@ -1,3 +1,5 @@
+#include <math.h>
+
 #ifndef VECTORS
 #define VECTORS
 typedef struct 

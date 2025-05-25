@@ -39,5 +39,4 @@ typedef struct {
 } GameStateArgs;
 
 GameState init_gamestate();
-//void update_gamestate(GameState *state, double steering_set_point_radians, int acceleration_input);
 void *loop_game_state(GameStateArgs *args);

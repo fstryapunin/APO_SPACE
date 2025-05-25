@@ -1,8 +1,12 @@
 #ifndef COMON
 #define COMON
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <math.h>
 #include "vector.h"
-#include "math.h"
+
 typedef struct
 {
     Vector position;

@@ -1,8 +1,8 @@
 #include "common.h"
-#include "vector.h"
 #define LED_COUNT 32
 #define PIXELS_PER_METER_IN_GAME 10
 #define PIXELS_PER_METER_IN_MAP 0.1f
+#define RENDER_DELAY_MS 20
 
 enum MenuState 
 {
@@ -10,6 +10,16 @@ enum MenuState
     PAUSE
 };
 
-void render_state(int fuel, double rotation, Vector position, bool is_stopped, bool is_crashed, Planet *planets);
-void render_map(Vector position, Planet *planets);
-void render_menu(MenuState state);
+typedef struct
+{
+    int *fuel;
+    double *rotation;
+    Vector *position;
+    int *player_state; 
+    Planet *planets;
+    unsigned short *planet_count;
+    unsigned char *memory_base;
+    bool stop;
+} RenderArgs;
+
+void *loop_render(RenderArgs *args);

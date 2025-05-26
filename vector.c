@@ -42,6 +42,10 @@ Vector multiply_vector_by_scalar(Vector vector, double scalar){
     return (Vector){ scalar * vector.x, scalar * vector.y };
 }
 
+Vector divide_vector_by_scalar(Vector vector, double scalar){
+    return (Vector){ scalar / vector.x, scalar / vector.y };
+}
+
 Vector get_vector_from_angle_and_magnitude(double angle, double magnitude){
     return multiply_vector_by_scalar(get_vector_from_angle(angle), magnitude);
 }

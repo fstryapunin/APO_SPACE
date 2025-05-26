@@ -50,11 +50,12 @@ void draw_planets(unsigned short *buffer, Planet *planets, unsigned short planet
 };
 
 void draw_player(unsigned short *buffer, double rotation_radians){
-    for (int player_y = -PLAYER_HEIGHT_PX * PIXELS_PER_METER_IN_GAME; player_y < PLAYER_HEIGHT_PX; player_y++) {
+    for (int player_y = - (PLAYER_HEIGHT_PX); player_y < PLAYER_HEIGHT_PX; player_y++) {
+        uint8_t color = player_y > 0 ? PLAYER_COLOR: DARK_BLUE_COLOR;
         for (int player_x = -PLAYER_WIDTH_PX * PIXELS_PER_METER_IN_GAME; player_x < PLAYER_WIDTH_PX; player_x++) {
             Vector rotated_px = rotate_vector((Vector) {player_x, player_y}, rotation_radians + M_PI / 2);
 
-            draw_pixel(buffer, (int)rotated_px.x + LCD_CENTER_X, (int)rotated_px.y + LCD_CENTER_Y, PLAYER_COLOR);
+            draw_pixel(buffer, (int)rotated_px.x + LCD_CENTER_X, (int)rotated_px.y + LCD_CENTER_Y, color);
         }
     }
 }

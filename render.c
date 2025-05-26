@@ -37,29 +37,38 @@ void draw_circle(unsigned short *buffer, int center_x, int center_y, int pixel_r
 }
 
 void draw_planets(unsigned short *buffer, Planet *planets, unsigned short planet_count, Vector *player_position){
-    printf("Position x: %lf y: %lf\n", player_position->x, player_position->y);
     for(int planet_index = 0; planet_index < planet_count; planet_index++){
         Planet planet = planets[planet_index];
         Vector planet_center_relative = subtract_vectors(planet.position, *player_position);
         Vector planet_center_relative_px = multiply_vector_by_scalar(planet_center_relative, PIXELS_PER_METER_IN_GAME);
         
-        int offset_x = planet_center_relative_px.x + (LCD_WIDTH / 2);
-        int offset_y = planet_center_relative_px.y + (LCD_HEIGHT / 2);
+        int offset_x = planet_center_relative_px.x + LCD_CENTER_X;
+        int offset_y = planet_center_relative_px.y + LCD_CENTER_Y;
 
-        printf("LCD %d %d\n", offset_x, offset_y);
-        
         draw_circle(buffer, offset_x, offset_y, planet.radius * PIXELS_PER_METER_IN_GAME, WHITE_COLOR);
     }
 };
 
+void draw_player(unsigned short *buffer, double rotation_radians){
+    for (int player_y = -PLAYER_HEIGHT_PX * PIXELS_PER_METER_IN_GAME; player_y < PLAYER_HEIGHT_PX; player_y++) {
+        for (int player_x = -PLAYER_WIDTH_PX * PIXELS_PER_METER_IN_GAME; player_x < PLAYER_WIDTH_PX; player_x++) {
+            Vector rotated_px = rotate_vector((Vector) {player_x, player_y}, rotation_radians + M_PI / 2);
+
+            draw_pixel(buffer, (int)rotated_px.x + LCD_CENTER_X, (int)rotated_px.y + LCD_CENTER_Y, PLAYER_COLOR);
+        }
+    }
+}
+
 void *loop_render(RenderArgs *args){
     void *parlcd_mem_base = map_phys_address(PARLCD_REG_BASE_PHYS, PARLCD_REG_SIZE, 0);
-    unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
     parlcd_hx8357_init(parlcd_mem_base);
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
-    draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
+
     while (!args->stop)
     {
+        unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
+        draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
+        draw_player(frame_buffer, *(args->rotation));
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
         usleep(RENDER_DELAY_MS * 1000);
     }

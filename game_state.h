@@ -1,14 +1,12 @@
 #include "common.h"
 
 #define MAX_PLANETS 100
-#define ACCELERATION_CONSTANT_M_S 10
+#define ACCELERATION_CONSTANT_M_UPDATE 0.01d
 #define ANGULAR_ACCELLRATION_CONSTANT_RAD (2 * M_PI) / 10
 #define FUEL_AMOUNT 500
 #define FUEL_BURN_L_S 1
-#define PLAYER_WIDTH 2
-#define PLAYER_HEIGHT 4 
 #define SCORE_REWARD 100
-#define UPDATE_DELAY_MS 1000
+#define UPDATE_DELAY_MS 100
 
 typedef enum PlayerState 
 {

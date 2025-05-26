@@ -18,6 +18,6 @@ typedef struct
 } InputArgs;
 
 
-Input init_input();
+Input init_input(unsigned char *mem_base);
 void *loop_input_collection(InputArgs *args);
 

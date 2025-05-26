@@ -41,47 +41,42 @@ double get_rotation(double rotation, double set_point){
 };
 
 Vector get_acceleration_vector(double rotation, int acceleration_input){
-    return rotate_vector((Vector){ACCELERATION_CONSTANT_M_S * acceleration_input, 0}, rotation);
+    return rotate_vector((Vector){ACCELERATION_CONSTANT_M_UPDATE * acceleration_input, 0}, rotation);
 };
 
 GameState init_gamestate(){
     GameState state;
+
+    state.planets[0] = (Planet){{0, 0}, 100, true, true};
+
+
     state.speed = (Vector){ 0, 0};
-    state.position = (Vector) {40000, -10000 + 2};
-    state.rotation_radians = M_PI;
+    state.position = (Vector) {0, 102};
+    state.rotation_radians = M_PI / 2;
     state.player_state = LANDED;
-    state.planet_count = MAX_PLANETS;
+    state.planet_count = 1;
     state.remaining_fuel = FUEL_AMOUNT;
     state.score = 0;
     state.current_planet_index = -1;
-
-    state.planets[0] = (Planet){{-16719, -63097}, 7648, false, false};
-    state.planets[1] = (Planet){{40000, -10000}, 7976, true, true};
-    state.planets[2] = (Planet){{88100, -10353}, 4345, false, false};
-    state.planets[3] = (Planet){{53529, -8223}, 6785, false, false};
-    state.planets[4] = (Planet){{23202, 4065}, 4553, false, false};
-    state.planets[5] = (Planet){{95178, 83109}, 9589, false, false};
-    state.planets[6] = (Planet){{42626, -10783}, 5251, false, false};
-    state.planets[7] = (Planet){{20515, -4892}, 5911, false, false};
-    state.planets[8] = (Planet){{-34721, -15668}, 1805, false, false};
-    state.planets[9] = (Planet){{-14723, -63413}, 6098, false, false};
-    state.planets[10] = (Planet){{93361, 5058}, 8351, false, false};
 
     return state;
 };
 
 void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){
+
+
+    Vector acceleration = get_acceleration_vector(state->rotation_radians, acceleration_input);
+
+    state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
+    state->speed = add_vectors(state->speed, acceleration);
+    state->position = add_vectors(state->position, state->speed);
+    
+    printf("\racceleration: %lf %lf rotation: %lf acc i: %lf r" , acceleration.x, acceleration.y, steering_set_point_radians, acceleration_input);
     if(state->player_state == LANDED && acceleration_input == 0){
         return;
     }
-
-    state->rotation_radians = get_rotation(state->rotation_radians, steering_set_point_radians);
-    state->speed = add_vectors(state->speed, get_acceleration_vector(state->rotation_radians, acceleration_input));
-    state->position = add_vectors(state->position, state->speed);
-    
     int collision_planet_index = -1;
     PlayerState nextPlayerState = get_player_state(state, &collision_planet_index);
-
 
     if(nextPlayerState == CRASHED){
         state->speed = (Vector){0, 0};
@@ -123,12 +118,12 @@ void *loop_game_state(GameStateArgs *args){
         // printf("Input acc: %lf rot: %lf\n", *(args->acceration), *(args->rotation));
         update_gamestate(args->state, *(args->rotation), *(args->acceration));
 
-        printf("State: %lf %lf %lf %lf\n", 
-            args->state->position.x, 
-            args->state->position.y, 
-            args->state->speed.x, 
-            args->state->speed.y
-        );
+        // printf("State: %lf %lf %lf %lf\n", 
+        //     args->state->position.x, 
+        //     args->state->position.y, 
+        //     args->state->speed.x, 
+        //     args->state->speed.y
+        // );
 
         usleep(UPDATE_DELAY_MS * 1000);
     }

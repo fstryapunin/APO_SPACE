@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
   printf("Hello world\n");
 
-  Input input = init_input();
+  Input input = init_input(memory_base);
   input.acceleration_input = 100;
  
   GameState state = init_gamestate();
@@ -42,18 +42,19 @@ int main(int argc, char *argv[])
     false
   };
 
-  //pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
-  //pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
+  pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
+  pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
   pthread_create(&render_thread, NULL, loop_render, &render_args);
-
 
   sleep(100);
 
   game_state_args.stop = true;
   input_args.stop = true;
+  render_args.stop = true;
 
-  // pthread_join(game_thread, NULL);
+  pthread_join(game_thread, NULL);
   pthread_join(input_thread, NULL);
+  pthread_join(render_thread, NULL);
 
   printf("Bye world\n");
 

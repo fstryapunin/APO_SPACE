@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "game_state.h"
 #include "math.h"
+#include "float.h"
 
 #define NUMBER_OF_COLLISION_POINTS 10
 #define LANDING_COLLISION_POINT_START_INDEX 9
@@ -58,23 +59,40 @@ GameState init_gamestate(){
     state.remaining_fuel = FUEL_AMOUNT;
     state.score = 0;
     state.current_planet_index = -1;
+    state.nearest_planet = 0;
 
     return state;
 };
 
-void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){
+int get_nearest_planet_index(GameState *state){
+    int index = -1;
+    double min_distance = DBL_MAX;
 
+    for(int planet_index = 0; planet_index < state->planet_count; planet_index++){
+        double distance = get_distance(state->position, state->planets[planet_index].position);
+        if(distance < min_distance){
+            min_distance = distance;
+            index = planet_index;
+        }
+    }
+    
+    return index;
+}
+
+void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){
+    if(state->player_state == LANDED && acceleration_input == 0){
+        return;
+    }
 
     Vector acceleration = get_acceleration_vector(state->rotation_radians, acceleration_input);
 
+    state->nearest_planet = get_nearest_planet_index(state);
     state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
     state->speed = add_vectors(state->speed, acceleration);
     state->position = add_vectors(state->position, state->speed);
     
     printf("\racceleration: %lf %lf rotation: %lf acc i: %lf r" , acceleration.x, acceleration.y, steering_set_point_radians, acceleration_input);
-    if(state->player_state == LANDED && acceleration_input == 0){
-        return;
-    }
+
     int collision_planet_index = -1;
     PlayerState nextPlayerState = get_player_state(state, &collision_planet_index);
 

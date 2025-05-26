@@ -55,8 +55,28 @@ void draw_player(unsigned short *buffer, double rotation_radians){
         for (int player_x = -PLAYER_WIDTH_PX * PIXELS_PER_METER_IN_GAME; player_x < PLAYER_WIDTH_PX; player_x++) {
             Vector rotated_px = rotate_vector((Vector) {player_x, player_y}, rotation_radians + M_PI / 2);
 
-            draw_pixel(buffer, (int)rotated_px.x + LCD_CENTER_X, (int)rotated_px.y + LCD_CENTER_Y, color);
+            draw_pixel(buffer, (int)rotated_px.x + LCD_CENTER_X - PLAYER_WIDTH_PX, (int)rotated_px.y + LCD_CENTER_Y, color);
         }
+    }
+}
+
+void draw_nearest_planet_indicator(unsigned short *buffer, Vector *player_position, Planet *planets, int index)
+{
+    if(index < 0) return;
+    Planet planet = planets[index];
+
+    double distance = get_distance(*player_position, planet.position);
+    printf("Distance %lf\n", distance);
+    if(distance > 20){
+        Vector direction = subtract_vectors(planet.position, *player_position);
+
+        Vector normalized = divide_vector_by_scalar(direction, get_magnitude_from_vector(direction));
+
+        printf("%lf %lf norm\n", normalized.x, normalized.y);
+
+        Vector indicator = multiply_vector_by_scalar(normalized, PIXELS_PER_METER_IN_GAME * 15);
+
+        draw_circle(buffer, indicator.x + LCD_CENTER_X, indicator.y + LCD_CENTER_Y, 5, WHITE_COLOR);
     }
 }
 
@@ -70,6 +90,7 @@ void *loop_render(RenderArgs *args){
         unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
         draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
         draw_player(frame_buffer, *(args->rotation));
+        draw_nearest_planet_indicator(frame_buffer, args->position, args->planets, *args->nearest_planet_index);
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
         usleep(RENDER_DELAY_MS * 1000);
     }

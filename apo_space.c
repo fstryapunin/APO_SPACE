@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     &(state.player_state),
     &(state.planets),
     &(state.planet_count),
+    &(state.nearest_planet),
     false
   };
 

@@ -27,6 +27,7 @@ typedef struct
     int score;
     Planet planets[MAX_PLANETS];
     unsigned short planet_count;
+    int nearest_planet;
 } GameState;
 
 typedef struct {

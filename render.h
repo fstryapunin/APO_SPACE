@@ -34,6 +34,7 @@ typedef struct
     int *player_state; 
     Planet *planets;
     unsigned short *planet_count;
+    int *nearest_planet_index;
     bool stop;
 } RenderArgs;
 

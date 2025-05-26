@@ -8,6 +8,10 @@
 // void render_map(Vector position, Planet *planets);
 // void render_menu(MenuState state);
 
+bool check_bounds(int x, int y){
+    return x >= 0 && x < LCD_WIDTH && y >= 0 && y < LCD_HEIGHT;
+}
+
 void render_frame_buffer_to_lcd(unsigned short *buffer, void *mem_base){
     for(int pixel_index  = 0; pixel_index < LCD_WIDTH * LCD_HEIGHT; pixel_index++){
         parlcd_write_data(mem_base, buffer[pixel_index]);
@@ -15,8 +19,7 @@ void render_frame_buffer_to_lcd(unsigned short *buffer, void *mem_base){
 }
 
 void draw_pixel(unsigned short *buffer, int x, int y, unsigned short color){
-    if(x >= 0 && x < LCD_WIDTH && y >= 0 && y < LCD_HEIGHT){
-        printf("Drawind %d %d\n", x, y);
+    if(check_bounds(x, y)){
         buffer[y * LCD_WIDTH + x] = color;
     }
 };
@@ -33,16 +36,19 @@ void draw_circle(unsigned short *buffer, int center_x, int center_y, int pixel_r
     }
 }
 
-void draw_planets(unsigned short *buffer, Planet *planets, int planet_count, Vector player_position){
+void draw_planets(unsigned short *buffer, Planet *planets, unsigned short planet_count, Vector *player_position){
+    printf("Position x: %lf y: %lf\n", player_position->x, player_position->y);
     for(int planet_index = 0; planet_index < planet_count; planet_index++){
         Planet planet = planets[planet_index];
-        if(
-            fabs(player_position.x - planet.position.x - planet.radius) * PIXELS_PER_METER_IN_GAME <= LCD_WIDTH
-            && fabs(player_position.y - planet.position.y - planet.radius) * PIXELS_PER_METER_IN_GAME <= LCD_HEIGHT
-        ){
-            Vector relative = multiply_vector_by_scalar((planet.position, player_position), PIXELS_PER_METER_IN_GAME);
-            draw_circle(buffer, relative.x, relative.y, planet.radius * PIXELS_PER_METER_IN_GAME, WHITE_COLOR);
-        }
+        Vector planet_center_relative = subtract_vectors(planet.position, *player_position);
+        Vector planet_center_relative_px = multiply_vector_by_scalar(planet_center_relative, PIXELS_PER_METER_IN_GAME);
+        
+        int offset_x = planet_center_relative_px.x + (LCD_WIDTH / 2);
+        int offset_y = planet_center_relative_px.y + (LCD_HEIGHT / 2);
+
+        printf("LCD %d %d\n", offset_x, offset_y);
+        
+        draw_circle(buffer, offset_x, offset_y, planet.radius * PIXELS_PER_METER_IN_GAME, WHITE_COLOR);
     }
 };
 
@@ -51,7 +57,7 @@ void *loop_render(RenderArgs *args){
     unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
     parlcd_hx8357_init(parlcd_mem_base);
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
-    draw_planets(frame_buffer, args->planets, args->planet_count, *(args->position));
+    draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
     while (!args->stop)
     {
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);

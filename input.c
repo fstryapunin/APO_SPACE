@@ -17,7 +17,7 @@ Input init_input(unsigned char *mem_base){
 
     printf("offsets %u %u\n", rotation_offset, acc_offset);
 
-    return (Input){0, 0, false, false};
+    return (Input){0, 0, false, false, false};
 }
 
 double map_to_rads(int input) {

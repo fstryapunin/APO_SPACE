@@ -8,6 +8,7 @@ typedef struct
     double rotation_input;
     bool pause_input;
     bool map_input;
+    bool stop;
 } Input;
 
 typedef struct

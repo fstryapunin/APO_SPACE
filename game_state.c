@@ -41,8 +41,42 @@ double get_rotation(double rotation, double set_point){
     return set_point > rotation ? rotation + ANGULAR_ACCELLRATION_CONSTANT_RAD : rotation - ANGULAR_ACCELLRATION_CONSTANT_RAD;
 };
 
-Vector get_acceleration_vector(double rotation, int acceleration_input){
-    return rotate_vector((Vector){ACCELERATION_CONSTANT_M_UPDATE * acceleration_input, 0}, rotation);
+Vector gravity_acceleration(Vector player, Planet planet) {
+    double mass = pow(planet.radius, 3) * 100000;
+    double distance = get_distance(player, planet.position);
+
+    if(distance - planet.radius <= 0.001) return (Vector) {0, 0};
+
+    Vector direction = subtract_vectors(planet.position, player);
+    return multiply_vector_by_scalar(direction, (GRAVITY_CONSTANT * mass) / (distance * distance));
+}
+
+Vector get_speed(GameState *state, Vector acceleration){
+    Planet nearest = state->planets[state->nearest_planet];
+
+    Vector current = add_vectors(state->speed, acceleration);
+
+    double distance = get_distance(add_vectors(state->position, current), nearest.position) - nearest.radius;
+
+    if(distance <= 0) return (Vector){ 0, 0};
+
+    return current;
+};
+
+Vector get_acceleration_vector(GameState *state, double acceleration_input){
+    Vector player_acceleration = acceleration_input > 0 ? rotate_vector((Vector){ACCELERATION_CONSTANT * acceleration_input, 0}, state->rotation_radians) : (Vector){0, 0};
+    Vector gravity_acceleration_cumulative = (Vector){0, 0};
+    printf("P direction %lf %lf,\n", player_acceleration.x, player_acceleration.y);
+
+    for(int i = 0; i < state->planet_count; i++){
+        Vector acceleration = gravity_acceleration(state->position, state->planets[i]);
+        Vector normalized = divide_vector_by_scalar(acceleration, UPDATE_FREQUENCY);
+        printf("G direction %lf %lf,\n", normalized.x, normalized.y);
+
+        gravity_acceleration_cumulative = add_vectors(gravity_acceleration_cumulative, normalized);
+    }
+
+    return add_vectors(player_acceleration, gravity_acceleration_cumulative);
 };
 
 GameState init_gamestate(){
@@ -79,61 +113,70 @@ int get_nearest_planet_index(GameState *state){
     return index;
 }
 
-void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){
+void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){    
     if(state->player_state == LANDED && acceleration_input == 0){
         return;
     }
 
-    Vector acceleration = get_acceleration_vector(state->rotation_radians, acceleration_input);
-
-    state->nearest_planet = get_nearest_planet_index(state);
     state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
-    state->speed = add_vectors(state->speed, acceleration);
+    state->nearest_planet = get_nearest_planet_index(state);
+    Vector acceleration = get_acceleration_vector(state, acceleration_input);
+    state->speed = get_speed(state, acceleration); //add_vectors(state->speed, acceleration);
     state->position = add_vectors(state->position, state->speed);
     
-    printf("\racceleration: %lf %lf rotation: %lf acc i: %lf r" , acceleration.x, acceleration.y, steering_set_point_radians, acceleration_input);
+    printf("acceleration: %lf %lf %lf speed : %lf %lf position: %lf %lf\n",
+        acceleration_input,
+        acceleration.x, 
+        acceleration.y,
+        state->speed.x,
+        state->speed.y,
+        state->position.x,
+        state->position.y
+    );
+
 
     int collision_planet_index = -1;
     PlayerState nextPlayerState = get_player_state(state, &collision_planet_index);
 
-    if(nextPlayerState == CRASHED){
-        state->speed = (Vector){0, 0};
-        state->player_state = CRASHED;
-        state->current_planet_index = collision_planet_index;
-        return;
-    }
+    // if(nextPlayerState == CRASHED){
+    //     state->speed = (Vector){0, 0};
+    //     state->player_state = CRASHED;
+    //     state->current_planet_index = collision_planet_index;
+    //     return;
+    // }
 
-    if(nextPlayerState == LANDED && state->player_state != LANDED){
-        Planet collision_planet = state->planets[collision_planet_index];
-        Vector planet_center = subtract_vectors(state->position, collision_planet.position);
-        double angle_to_planet = get_angle(planet_center);
-        double distance = get_magnitude_from_vector(planet_center);
+    // if(nextPlayerState == LANDED && state->player_state != LANDED){
+    //     Planet collision_planet = state->planets[collision_planet_index];
+    //     Vector planet_center = subtract_vectors(state->position, collision_planet.position);
+    //     double angle_to_planet = get_angle(planet_center);
+    //     double distance = get_magnitude_from_vector(planet_center);
 
-        Vector position_relative_to_planet = add_vectors(
-            rotate_vector((Vector){ 0, 2 }, angle_to_planet), 
-            get_vector_from_angle_and_magnitude(angle_to_planet, collision_planet.radius));
+    //     Vector position_relative_to_planet = add_vectors(
+    //         rotate_vector((Vector){ 0, 2 }, angle_to_planet), 
+    //         get_vector_from_angle_and_magnitude(angle_to_planet, collision_planet.radius));
 
-        state->position = add_vectors(position_relative_to_planet, collision_planet.position);
-        state->speed = (Vector){ 0, 0 };
-        state->rotation_radians = angle_to_planet;
-        state->current_planet_index = collision_planet_index;
+    //     state->position = add_vectors(position_relative_to_planet, collision_planet.position);
+    //     state->speed = (Vector){ 0, 0 };
+    //     state->rotation_radians = angle_to_planet;
+    //     state->current_planet_index = collision_planet_index;
 
-        if(state->planets[collision_planet_index].is_visited == false){
-            state->score = state->score + SCORE_REWARD;
-            state->planets[collision_planet_index].is_visited = true;
-        }
+    //     if(state->planets[collision_planet_index].is_visited == false){
+    //         state->score = state->score + SCORE_REWARD;
+    //         state->planets[collision_planet_index].is_visited = true;
+    //     }
 
-        return;
-    }
+    //     return;
+    // }
 
     state->player_state = nextPlayerState;
 };
 
 void *loop_game_state(GameStateArgs *args){
     // printf("Stared \n");
+    printf("Udpating at %lf, acc per update : %lf\n", UPDATE_DELAY_MS * 1000, ACCELERATION_CONSTANT);
+
     while (!args->stop)
     {
-        // printf("Input acc: %lf rot: %lf\n", *(args->acceration), *(args->rotation));
         update_gamestate(args->state, *(args->rotation), *(args->acceration));
 
         // printf("State: %lf %lf %lf %lf\n", 
@@ -143,7 +186,7 @@ void *loop_game_state(GameStateArgs *args){
         //     args->state->speed.y
         // );
 
-        usleep(UPDATE_DELAY_MS * 1000);
+        usleep((int)(UPDATE_DELAY_MS * 1000));
     }
 
     return NULL;

@@ -121,7 +121,7 @@ void update_gamestate(GameState *state, double steering_set_point_radians, doubl
     state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
     state->nearest_planet = get_nearest_planet_index(state);
     Vector acceleration = get_acceleration_vector(state, acceleration_input);
-    state->speed = get_speed(state, acceleration); //add_vectors(state->speed, acceleration);
+    state->speed = get_speed(state, acceleration);
     state->position = add_vectors(state->position, state->speed);
     
     printf("acceleration: %lf %lf %lf speed : %lf %lf position: %lf %lf\n",

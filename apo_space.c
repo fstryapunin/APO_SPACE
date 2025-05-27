@@ -49,6 +49,10 @@ int main(int argc, char *argv[])
 
   while (!input.stop)
   {
+    if(input.pause_input){
+      state = init_gamestate();
+      input = init_input(memory_base);
+    }
     usleep(100);
   }
   

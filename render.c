@@ -66,13 +66,10 @@ void draw_nearest_planet_indicator(unsigned short *buffer, Vector *player_positi
     Planet planet = planets[index];
 
     double distance = get_distance(*player_position, planet.position);
-    printf("Distance %lf\n", distance);
     if(distance > 20){
         Vector direction = subtract_vectors(planet.position, *player_position);
 
         Vector normalized = divide_vector_by_scalar(direction, get_magnitude_from_vector(direction));
-
-        printf("%lf %lf norm\n", normalized.x, normalized.y);
 
         Vector indicator = multiply_vector_by_scalar(normalized, PIXELS_PER_METER_IN_GAME * 15);
 
@@ -84,7 +81,6 @@ void *loop_render(RenderArgs *args){
     void *parlcd_mem_base = map_phys_address(PARLCD_REG_BASE_PHYS, PARLCD_REG_SIZE, 0);
     parlcd_hx8357_init(parlcd_mem_base);
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
-
     while (!args->stop)
     {
         unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};

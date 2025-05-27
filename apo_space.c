@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     false
   };
 
-  pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
   pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
+  pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
   pthread_create(&render_thread, NULL, loop_render, &render_args);
 
   sleep(100);

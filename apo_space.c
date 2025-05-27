@@ -47,7 +47,11 @@ int main(int argc, char *argv[])
   pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
   pthread_create(&render_thread, NULL, loop_render, &render_args);
 
-  sleep(100);
+  while (!input.stop)
+  {
+    usleep(100);
+  }
+  
 
   game_state_args.stop = true;
   input_args.stop = true;

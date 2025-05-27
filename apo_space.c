@@ -23,8 +23,6 @@ int main(int argc, char *argv[])
   pthread_t input_thread;
   pthread_t render_thread;
 
-  printf("Hello world\n");
-
   Input input = init_input(memory_base);
   input.acceleration_input = 100;
  
@@ -64,8 +62,6 @@ int main(int argc, char *argv[])
   pthread_join(game_thread, NULL);
   pthread_join(input_thread, NULL);
   pthread_join(render_thread, NULL);
-
-  printf("Bye world\n");
 
   return 0;
 }

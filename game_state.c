@@ -66,12 +66,12 @@ Vector get_speed(GameState *state, Vector acceleration){
 Vector get_acceleration_vector(GameState *state, double acceleration_input){
     Vector player_acceleration = acceleration_input > 0 ? rotate_vector((Vector){ACCELERATION_CONSTANT * acceleration_input, 0}, state->rotation_radians) : (Vector){0, 0};
     Vector gravity_acceleration_cumulative = (Vector){0, 0};
-    printf("P direction %lf %lf,\n", player_acceleration.x, player_acceleration.y);
+    // printf("P direction %lf %lf,\n", player_acceleration.x, player_acceleration.y);
 
     for(int i = 0; i < state->planet_count; i++){
         Vector acceleration = gravity_acceleration(state->position, state->planets[i]);
         Vector normalized = divide_vector_by_scalar(acceleration, UPDATE_FREQUENCY);
-        printf("G direction %lf %lf,\n", normalized.x, normalized.y);
+        // printf("G direction %lf %lf,\n", normalized.x, normalized.y);
 
         gravity_acceleration_cumulative = add_vectors(gravity_acceleration_cumulative, normalized);
     }
@@ -124,15 +124,15 @@ void update_gamestate(GameState *state, double steering_set_point_radians, doubl
     state->speed = get_speed(state, acceleration);
     state->position = add_vectors(state->position, state->speed);
     
-    printf("acceleration: %lf %lf %lf speed : %lf %lf position: %lf %lf\n",
-        acceleration_input,
-        acceleration.x, 
-        acceleration.y,
-        state->speed.x,
-        state->speed.y,
-        state->position.x,
-        state->position.y
-    );
+    // printf("acceleration: %lf %lf %lf speed : %lf %lf position: %lf %lf\n",
+    //     acceleration_input,
+    //     acceleration.x, 
+    //     acceleration.y,
+    //     state->speed.x,
+    //     state->speed.y,
+    //     state->position.x,
+    //     state->position.y
+    // );
 
 
     int collision_planet_index = -1;
@@ -179,12 +179,12 @@ void *loop_game_state(GameStateArgs *args){
     {
         update_gamestate(args->state, *(args->rotation), *(args->acceration));
 
-        // printf("State: %lf %lf %lf %lf\n", 
-        //     args->state->position.x, 
-        //     args->state->position.y, 
-        //     args->state->speed.x, 
-        //     args->state->speed.y
-        // );
+        printf("\rState: %lf %lf %lf %lf\n", 
+            args->state->position.x, 
+            args->state->position.y, 
+            args->state->speed.x, 
+            args->state->speed.y
+        );
 
         usleep((int)(UPDATE_DELAY_MS * 1000));
     }

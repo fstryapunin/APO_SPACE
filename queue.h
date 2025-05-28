@@ -30,6 +30,8 @@ InputEvent dequeu_input_event(Queue *queue);
 bool acquire_queue_lock(Queue *queue);
 void release_queue_lock(Queue *queue);
 
+void wait_for_queue_lock(Queue *queue);
+
 Queue init_queue();
 void free_queue();
 

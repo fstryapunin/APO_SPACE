@@ -57,3 +57,9 @@ bool acquire_queue_lock(Queue *queue){
 void release_queue_lock(Queue *queue){
     queue->lock = false;
 };
+
+void wait_for_queue_lock(Queue *queue){
+    while(!acquire_queue_lock(queue)){
+        usleep(100);
+    };
+}

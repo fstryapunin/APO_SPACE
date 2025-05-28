@@ -30,7 +30,7 @@ InputEvent dequeu_input_event(Queue *queue){
 };
 
 Queue init_queue(){
-    return (Queue){ NULL, 0 };
+    return (Queue){ NULL, 0, false };
 }
 
 void free_queue(Queue *queue){
@@ -44,4 +44,16 @@ void free_queue(Queue *queue){
     }
     
     queue->count = 0;
+};
+
+bool acquire_queue_lock(Queue *queue){
+    if(queue->lock) return false;
+
+    queue->lock = true;
+
+    return true;
+};
+
+void release_queue_lock(Queue *queue){
+    queue->lock = false;
 };

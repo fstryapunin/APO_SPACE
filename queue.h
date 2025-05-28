@@ -21,10 +21,14 @@ typedef struct Input {
 typedef struct {
     Input *start;
     int count;
+    bool lock;
 } Queue;
 
 void enqueue_input_event(Queue *queue, InputEvent event);
 InputEvent dequeu_input_event(Queue *queue);
+
+bool acquire_queue_lock(Queue *queue);
+void release_queue_lock(Queue *queue);
 
 Queue init_queue();
 void free_queue();

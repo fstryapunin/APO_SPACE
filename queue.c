@@ -1,6 +1,8 @@
 #include "queue.h"
 
 void enqueue_input_event(Queue *queue, InputEvent event){
+    queue->count = queue->count + 1;
+
     Input *input = malloc(sizeof(Input));
     input->event = event;
 
@@ -16,7 +18,6 @@ void enqueue_input_event(Queue *queue, InputEvent event){
         last = last->next;
     }    
 
-    queue->count = queue->count + 1;
     last->next = input;
 };
 

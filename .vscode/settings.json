@@ -3,6 +3,12 @@
         "mzapo_parlcd.h": "c",
         "math.h": "c",
         "render.h": "c",
-        "io.h": "c"
+        "io.h": "c",
+        "queue.h": "c",
+        "mzapo_phys.h": "c",
+        "input.h": "c",
+        "types.h": "c",
+        "game_state.h": "c",
+        "common.h": "c"
     }
 }

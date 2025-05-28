@@ -8,40 +8,43 @@
 #define DISTANCE_TRESHOLD_FOR_LANDING 1
 #define SPEED_TRESHOLD_FOR_LANDING 5
 
-static const Vector collision_points[NUMBER_OF_COLLISION_POINTS] = 
-    {{0, 2}, {1, 1}, {1, 0}, {1, -1}, {-1, 1}, {1, 0}, {-1, -1}, {1, -2}, {-1, -2}, {0, -2}};
+GameState init_gamestate(){
+    GameState state;
 
-PlayerState get_player_state(GameState *state, int *collision_planet_index){
+    state.planets[0] = (Planet){{0, 0}, 100, true, true};
+
+
+
+    state.rotation_set_point = M_PI / 2;
+    state.motor_power = 0;
+    state.speed = (Vector){ 0, 0};
+    state.position = (Vector) {0, 102};
+    state.player_state = LANDED;
+    state.planet_count = 1;
+
+    state.remaining_fuel = FUEL_AMOUNT;
+    state.score = 0;
+    state.current_planet = -1;
+
+    return state;
+};
+
+int get_nearest_planet_index(GameState *state){
+    int index = -1;
+    double min_distance = DBL_MAX;
+
     for(int planet_index = 0; planet_index < state->planet_count; planet_index++){
-        for(int colision_point_index = 0; colision_point_index  <  NUMBER_OF_COLLISION_POINTS; colision_point_index++)
-        {
-            Vector collision_point_relative_vector = rotate_vector(collision_points[colision_point_index], state->rotation_radians);
-            Vector collision_point_coordinates = add_vectors(state->position, collision_point_relative_vector);
-            double distance = get_distance(state->planets[planet_index].position, collision_point_coordinates) - state->planets[planet_index].radius;
-            double speed_magnitude = get_magnitude_from_vector(state->speed);
-
-            if(colision_point_index == LANDING_COLLISION_POINT_START_INDEX && distance < (DISTANCE_TRESHOLD_FOR_LANDING) && speed_magnitude < SPEED_TRESHOLD_FOR_LANDING)
-            {
-                *collision_planet_index = planet_index;
-                return LANDED;
-            }
-            if(distance < 0){
-                *collision_planet_index = planet_index;
-                return CRASHED;
-            }
+        double distance = get_distance(state->position, state->planets[planet_index].position);
+        if(distance < min_distance){
+            min_distance = distance;
+            index = planet_index;
         }
     }
     
-    return FLYING;
-};
+    return index;
+}
 
-double get_rotation(double rotation, double set_point){
-    if(abs(set_point - rotation) < ANGULAR_ACCELLRATION_CONSTANT_RAD) return set_point;
-    
-    return set_point > rotation ? rotation + ANGULAR_ACCELLRATION_CONSTANT_RAD : rotation - ANGULAR_ACCELLRATION_CONSTANT_RAD;
-};
-
-Vector gravity_acceleration(Vector player, Planet planet) {
+Vector get_gravity_acceleration(Vector player, Planet planet) {
     double mass = pow(planet.radius, 3) * 100000;
     double distance = get_distance(player, planet.position);
 
@@ -63,13 +66,13 @@ Vector get_speed(GameState *state, Vector acceleration){
     return current;
 };
 
-Vector get_acceleration_vector(GameState *state, double acceleration_input){
-    Vector player_acceleration = acceleration_input > 0 ? rotate_vector((Vector){ACCELERATION_CONSTANT * acceleration_input, 0}, state->rotation_radians) : (Vector){0, 0};
+Vector get_acceleration_vector(GameState *state){
+    Vector player_acceleration = state->motor_power > 0 ? rotate_vector((Vector){ACCELERATION_CONSTANT * state->motor_power, 0}, state->rotation_set_point) : (Vector) {0, 0};
     Vector gravity_acceleration_cumulative = (Vector){0, 0};
     // printf("P direction %lf %lf,\n", player_acceleration.x, player_acceleration.y);
 
     for(int i = 0; i < state->planet_count; i++){
-        Vector acceleration = gravity_acceleration(state->position, state->planets[i]);
+        Vector acceleration = get_gravity_acceleration(state->position, state->planets[i]);
         Vector normalized = divide_vector_by_scalar(acceleration, UPDATE_FREQUENCY);
         // printf("G direction %lf %lf,\n", normalized.x, normalized.y);
 
@@ -79,50 +82,54 @@ Vector get_acceleration_vector(GameState *state, double acceleration_input){
     return add_vectors(player_acceleration, gravity_acceleration_cumulative);
 };
 
-GameState init_gamestate(){
-    GameState state;
-
-    state.planets[0] = (Planet){{0, 0}, 100, true, true};
-
-
-    state.speed = (Vector){ 0, 0};
-    state.position = (Vector) {0, 102};
-    state.rotation_radians = M_PI / 2;
-    state.player_state = LANDED;
-    state.planet_count = 1;
-    state.remaining_fuel = FUEL_AMOUNT;
-    state.score = 0;
-    state.current_planet_index = -1;
-    state.nearest_planet = 0;
-
-    return state;
-};
-
-int get_nearest_planet_index(GameState *state){
-    int index = -1;
-    double min_distance = DBL_MAX;
-
-    for(int planet_index = 0; planet_index < state->planet_count; planet_index++){
-        double distance = get_distance(state->position, state->planets[planet_index].position);
-        if(distance < min_distance){
-            min_distance = distance;
-            index = planet_index;
-        }
+int get_motor_power(int current, InputEvent event){
+    if(event == ROTATE_RIGHT_BLUE && current < MAX_ACCELERATION_INPUT){
+        return current + 1;
     }
-    
-    return index;
+
+    if(event == ROTATE_LEFT_BLUE && current > MIN_ACCELERATION_INPUT){
+        return current - 1;
+    }
+
+    return current;
 }
 
-void update_gamestate(GameState *state, double steering_set_point_radians, double acceleration_input){    
-    if(state->player_state == LANDED && acceleration_input == 0){
+double get_rotation_radians(double current, InputEvent event){
+    double next = current;
+    if(event == ROTATE_LEFT_GREEN){
+        next = next - RADIANS_PER_KNOB_INPUT;
+    }
+
+    if(event == ROTATE_RIGHT_GREEN){
+        next = next + RADIANS_PER_KNOB_INPUT;
+    }
+
+    return fmod(next, 2 * M_PI);
+}
+
+void update_gamestate(GameState *state, Queue *queue){
+    wait_for_queue_lock(queue);
+
+    if(state->player_state == LANDED && queue->count == 0){
+        release_queue_lock(queue);
         return;
     }
 
-    state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
-    state->nearest_planet = get_nearest_planet_index(state);
-    Vector acceleration = get_acceleration_vector(state, acceleration_input);
-    state->speed = get_speed(state, acceleration);
-    state->position = add_vectors(state->position, state->speed);
+    InputEvent input = queue->count > 0 ? dequeu_input_event(queue) : NONE;
+    release_queue_lock(queue);
+
+    if(state == LANDED && (input != ROTATE_LEFT_BLUE && input != ROTATE_RIGHT_BLUE)){
+        return;
+    }
+ 
+    state->motor_power = get_motor_power(state->motor_power, input);
+    state->rotation_set_point = get_rotation_radians(state->rotation_set_point, input);
+
+    // state->rotation_radians = fmod((M_PI / 2 + steering_set_point_radians), (2 * M_PI));
+    // state->nearest_planet = get_nearest_planet_index(state);
+    // Vector acceleration = get_acceleration_vector(state, acceleration_input);
+    // state->speed = get_speed(state, acceleration);
+    // state->position = add_vectors(state->position, state->speed);
     
     // printf("acceleration: %lf %lf %lf speed : %lf %lf position: %lf %lf\n",
     //     acceleration_input,

@@ -68,7 +68,6 @@ void *loop_input_collection(InputArgs *args){
         wait_for_queue_lock(args->input_queue);
 
         if(detect_button_raising_edge(previous_value, knobs_raw_value, BLUE_BUTTON_BITWISE_OFFSET)){
-            printf("Enq blue!\n");
             enqueue_input_event(args->input_queue, BLUE_KEY);
         }
 

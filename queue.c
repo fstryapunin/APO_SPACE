@@ -16,15 +16,20 @@ void enqueue_input_event(Queue *queue, InputEvent event){
         last = last->next;
     }    
 
+    queue->count = queue->count + 1;
     last->next = input;
 };
 
 InputEvent dequeu_input_event(Queue *queue){
+    if(queue->start == NULL) return;
+
     Input *next = queue->start;
     InputEvent event = next->event;
 
     queue->start = next->next;
     free(next);
+
+    queue->count = queue->count - 1;
 
     return event;
 };

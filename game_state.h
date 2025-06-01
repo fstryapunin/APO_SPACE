@@ -14,7 +14,7 @@
 
 #define MAX_ACCELERATION_INPUT 10
 #define MIN_ACCELERATION_INPUT 0
-#define RADIANS_PER_KNOB_INPUT (2 * M_PI) / (double)20
+#define RADIANS_PER_KNOB_INPUT (2 * M_PI) / (double)100
 
 #define UPDATE_FREQUENCY (double)100
 #define UPDATE_DELAY_MS ((double)1 / UPDATE_FREQUENCY) * 1000

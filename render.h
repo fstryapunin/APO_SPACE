@@ -36,6 +36,7 @@ typedef struct
     unsigned short *planet_count;
     int *nearest_planet_index;
     double *remaining_fuel;
+    PlayerState *player_state;
     bool *stop;
 } RenderArgs;
 

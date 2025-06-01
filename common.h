@@ -12,6 +12,13 @@
 #define FUEL_AMOUNT 3200
 #define FUEL_PER_LED (FUEL_AMOUNT / 32)
 
+typedef enum PlayerState 
+{
+    CRASHED = 0,
+    LANDED = 1,
+    FLYING = 2
+} PlayerState;
+
 typedef struct
 {
     Vector position;

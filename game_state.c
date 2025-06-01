@@ -119,6 +119,9 @@ void update_gamestate(GameState *state, Queue *queue){
     InputEvent input = queue->count > 0 ? dequeu_input_event(queue) : NONE;
     release_queue_lock(queue);
 
+    if(state->player_state == CRASHED && input != RED_KEY) return;
+
+
     if(input == RED_KEY){
         *state = init_gamestate();
         return;

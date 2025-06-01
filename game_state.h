@@ -19,14 +19,6 @@
 #define UPDATE_FREQUENCY (double)100
 #define UPDATE_DELAY_MS ((double)1 / UPDATE_FREQUENCY) * 1000
 
-
-typedef enum PlayerState 
-{
-    CRASHED = 0,
-    LANDED = 1,
-    FLYING = 2
-} PlayerState;
-
 // speed is defined in meters per second
 typedef struct 
 {

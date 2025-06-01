@@ -14,6 +14,17 @@ void render_frame_buffer_to_lcd(unsigned short *buffer, void *mem_base){
     }
 }
 
+void render_player_state(PlayerState *state, void *mem_base){
+    *(volatile uint32_t*)(mem_base + SPILED_REG_LED_RGB1_o) = (uint8_t)15;
+
+    int shift = 0;
+
+    if(*state == LANDED) shift = 8;
+    if(*state == CRASHED) shift = 16;
+
+    *(volatile uint32_t*)(mem_base + SPILED_REG_LED_RGB1_o) <<= shift;
+}
+
 void render_fuel_to_leds(double *remaining_fuel, void *mem_base){
     int active_led_count = ceil(*remaining_fuel / FUEL_PER_LED);
 
@@ -101,6 +112,7 @@ void *loop_render(RenderArgs *args){
         draw_indicators(frame_buffer, args->position, args->planets, args->planet_count);
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
         render_fuel_to_leds(args->remaining_fuel, spiled_mem_base);
+        render_player_state(args->player_state, spiled_mem_base);
         usleep(RENDER_DELAY_MS * 1000);
     }
 };

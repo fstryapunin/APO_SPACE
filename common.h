@@ -9,6 +9,8 @@
 
 #define PLAYER_WIDTH 2
 #define PLAYER_HEIGHT 8
+#define FUEL_AMOUNT 3200
+#define FUEL_PER_LED (FUEL_AMOUNT / 32)
 
 typedef struct
 {

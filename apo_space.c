@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     &state.planets,
     &state.planet_count,
     &state.current_planet,
+    &state.remaining_fuel,
     &stop_game
   };
 

@@ -61,8 +61,16 @@ PlayerState detect_colision(GameState *state, int *collision_planet_index){
     return FLYING;
 }
 
+Vector get_motor_acceleration(GameState *state){
+    if(state->motor_power == 0 || state->remaining_fuel < 0.001){
+        return (Vector){0, 0};
+    }
+
+    return rotate_vector((Vector){ACCELERATION_CONSTANT * state->motor_power, 0}, state->rotation_set_point);
+}
+
 Vector get_acceleration_vector(GameState *state){
-    Vector player_acceleration = state->motor_power > 0 ? rotate_vector((Vector){ACCELERATION_CONSTANT * state->motor_power, 0}, state->rotation_set_point) : (Vector) {0, 0};
+    Vector player_acceleration = get_motor_acceleration(state);
     Vector gravity_acceleration_cumulative = (Vector){0, 0};
     // printf("P direction %lf %lf,\n", player_acceleration.x, player_acceleration.y);
 
@@ -123,7 +131,7 @@ void update_gamestate(GameState *state, Queue *queue){
     state->motor_power = get_motor_power(state->motor_power, input);
     state->rotation_set_point = get_rotation_radians(state->rotation_set_point, input);
     state->speed = add_vectors(state->speed, get_acceleration_vector(state));
-
+    state->remaining_fuel = fmax(0, state->remaining_fuel - (((double)FUEL_BURN_PER_SECOND / UPDATE_FREQUENCY) * state->motor_power));
     state->player_state = detect_colision(state, &state->current_planet);
 
     if(state->player_state == FLYING){
@@ -152,7 +160,6 @@ void *loop_game_state(GameStateArgs *args){
     while (!*(args->stop))
     {
         update_gamestate(args->state, args->input_queue);
-        printf("\r Position x: %lf y: %lf", args->state->position.x, args->state->position.y);
         usleep((int)(UPDATE_DELAY_MS * 1000));
     }
 

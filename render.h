@@ -35,6 +35,7 @@ typedef struct
     Planet *planets;
     unsigned short *planet_count;
     int *nearest_planet_index;
+    double *remaining_fuel;
     bool *stop;
 } RenderArgs;
 

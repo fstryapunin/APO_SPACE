@@ -9,10 +9,10 @@ LDFLAGS += -static
 LDLIBS += -lrt -lpthread
 LDLIBS += -lm
 
-SOURCES = apo_space.c game_state.c vector.c input.c render.c mzapo_phys.c mzapo_parlcd.c
+SOURCES = apo_space.c game_state.c vector.c input.c render.c mzapo_phys.c mzapo_parlcd.c queue.c
 #SOURCES += font_prop14x16.c font_rom8x16.c
 TARGET_EXE = apo_space
-TARGET_IP ?= 192.168.223.122
+TARGET_IP ?= 192.168.223.115
 ifeq ($(TARGET_IP),)
 ifneq ($(filter debug run,$(MAKECMDGOALS)),)
 $(warning The target IP address is not set)

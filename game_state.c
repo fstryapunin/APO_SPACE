@@ -111,6 +111,11 @@ void update_gamestate(GameState *state, Queue *queue){
     InputEvent input = queue->count > 0 ? dequeu_input_event(queue) : NONE;
     release_queue_lock(queue);
 
+    if(input == RED_KEY){
+        *state = init_gamestate();
+        return;
+    }
+
     if(state == LANDED && (input != ROTATE_LEFT_BLUE && input != ROTATE_RIGHT_BLUE)){
         return;
     }

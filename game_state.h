@@ -1,7 +1,7 @@
 #include "common.h"
 #include "queue.h"
 
-#define MAX_PLANETS 100
+#define PLANET_COUNT 3
 #define ACCELERATION_CONSTANT_M_S (double)0.01
 #define ANGULAR_ACCELLRATION_CONSTANT_RAD (2 * M_PI) / 10
 #define GRAVITY_CONSTANT 6.67430e-11
@@ -37,7 +37,7 @@ typedef struct
     PlayerState player_state;
     double remaining_fuel;
     int current_planet;
-    Planet planets[MAX_PLANETS];
+    Planet planets[PLANET_COUNT];
     unsigned short planet_count;
 } GameState;
 

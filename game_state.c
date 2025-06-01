@@ -12,15 +12,15 @@ GameState init_gamestate(){
     GameState state;
 
     state.planets[0] = (Planet){{0, 0}, 100, true, true};
-
-
+    state.planets[1] = (Planet){{0, 20000}, 50, true, true};
+    state.planets[2] = (Planet){{15000, 3000}, 20, true, true};
 
     state.rotation_set_point = M_PI / 2;
     state.motor_power = 0;
     state.speed = (Vector){ 0, 0};
     state.position = (Vector) {0, 104};
     state.player_state = LANDED;
-    state.planet_count = 1;
+    state.planet_count = PLANET_COUNT;
     state.remaining_fuel = (double)FUEL_AMOUNT;
     state.current_planet = -1;
 
@@ -28,7 +28,7 @@ GameState init_gamestate(){
 };
 
 Vector get_gravity_acceleration(Vector player, Planet planet) {
-    double mass = pow(planet.radius, 3) * 100000;
+    double mass = pow(planet.radius, 3) * 50000;
     double distance = get_distance(player, planet.position);
 
     if(distance - planet.radius <= 0.001) return (Vector) {0, 0};
@@ -152,6 +152,7 @@ void *loop_game_state(GameStateArgs *args){
     while (!*(args->stop))
     {
         update_gamestate(args->state, args->input_queue);
+        printf("\r Position x: %lf y: %lf", args->state->position.x, args->state->position.y);
         usleep((int)(UPDATE_DELAY_MS * 1000));
     }
 

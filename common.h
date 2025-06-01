@@ -1,3 +1,5 @@
+// COMMONLY USED TYPES, CONSTANTS AND DEPENDENCIES
+
 #ifndef COMON
 #define COMON
 #include "vector.h"

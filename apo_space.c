@@ -17,6 +17,7 @@
 
 int main(int argc, char *argv[])
 {
+    // Threads required to run the game.
     pthread_t game_thread;
     pthread_t input_thread;
     pthread_t render_thread;
@@ -24,7 +25,8 @@ int main(int argc, char *argv[])
     bool stop_game = false;
     GameState state = init_gamestate();
     Queue input_queue = init_queue();
-
+    
+    // Arguments for threads required to run the game.
     InputArgs input_args = (InputArgs){&input_queue, &stop_game};
     GameStateArgs game_state_args = (GameStateArgs){&state, &input_queue, &stop_game};
     RenderArgs render_args = (RenderArgs){&state.rotation_set_point, &state.position,       &state.planets,
@@ -37,6 +39,7 @@ int main(int argc, char *argv[])
 
     while (!stop_game)
     {
+        // Possible to add graceful exit here.
         usleep(100);
     }
 

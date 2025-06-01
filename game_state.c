@@ -8,6 +8,7 @@
 #define DISTANCE_TRESHOLD_FOR_LANDING 1
 #define SPEED_TRESHOLD_FOR_LANDING 5
 
+// Set gamestate to initials values
 GameState init_gamestate()
 {
     GameState state;
@@ -29,6 +30,7 @@ GameState init_gamestate()
     return state;
 };
 
+// Calculates acceleration created by planets gravity.
 Vector get_gravity_acceleration(Vector player, Planet planet)
 {
     double mass = pow(planet.radius, 3) * 50000;
@@ -41,6 +43,7 @@ Vector get_gravity_acceleration(Vector player, Planet planet)
     return multiply_vector_by_scalar(direction, (GRAVITY_CONSTANT * mass) / (distance * distance));
 }
 
+// Detect wether player will collide with any planet on next position update.
 PlayerState detect_colision(GameState *state, int *collision_planet_index)
 {
     Vector next_position = add_vectors(state->position, state->speed);
@@ -68,6 +71,7 @@ PlayerState detect_colision(GameState *state, int *collision_planet_index)
     return FLYING;
 }
 
+// Calculate acceleration created by rockets motor.
 Vector get_motor_acceleration(GameState *state)
 {
     if (state->motor_power == 0 || state->remaining_fuel < 0.001)
@@ -78,6 +82,7 @@ Vector get_motor_acceleration(GameState *state)
     return rotate_vector((Vector){ACCELERATION_CONSTANT * state->motor_power, 0}, state->rotation_set_point);
 }
 
+// Get combined motor and gravity accelerations.
 Vector get_acceleration_vector(GameState *state)
 {
     Vector player_acceleration = get_motor_acceleration(state);
@@ -95,6 +100,7 @@ Vector get_acceleration_vector(GameState *state)
     return add_vectors(player_acceleration, gravity_acceleration_cumulative);
 };
 
+// Parse motor input
 int get_motor_power(int current, InputEvent event)
 {
     if (event == ROTATE_RIGHT_BLUE && current < MAX_ACCELERATION_INPUT)
@@ -110,6 +116,7 @@ int get_motor_power(int current, InputEvent event)
     return current;
 }
 
+// Parse rotation input
 double get_rotation_radians(double current, InputEvent event)
 {
     double next = current;
@@ -126,6 +133,7 @@ double get_rotation_radians(double current, InputEvent event)
     return fmod(next, 2 * M_PI);
 }
 
+// Parse map input
 bool get_show_map(GameState *state, InputEvent event)
 {
     if (event == GREEN_KEY)
@@ -136,6 +144,7 @@ bool get_show_map(GameState *state, InputEvent event)
     return state->show_map;
 };
 
+// Update gamestate based on inputs and current state
 void update_gamestate(GameState *state, Queue *queue)
 {
     wait_for_queue_lock(queue);
@@ -195,6 +204,7 @@ void update_gamestate(GameState *state, Queue *queue)
     }
 };
 
+// Main function of game state thread. Updates game state ad infinitum.
 void *loop_game_state(GameStateArgs *args)
 {
     printf("Udpating at %lf, acc per update : %lf\n", UPDATE_DELAY_MS * 1000, ACCELERATION_CONSTANT);

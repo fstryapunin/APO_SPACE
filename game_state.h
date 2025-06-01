@@ -19,7 +19,7 @@
 #define UPDATE_FREQUENCY (double)100
 #define UPDATE_DELAY_MS ((double)1 / UPDATE_FREQUENCY) * 1000
 
-// speed is defined in meters per second
+// Structure to represent game state.
 typedef struct
 {
     int motor_power;

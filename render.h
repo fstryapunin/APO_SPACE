@@ -28,14 +28,12 @@ enum MenuState
 
 typedef struct
 {
-    int *fuel;
     double *rotation;
     Vector *position;
-    int *player_state; 
     Planet *planets;
     unsigned short *planet_count;
     int *nearest_planet_index;
-    bool stop;
+    bool *stop;
 } RenderArgs;
 
 void *loop_render(RenderArgs *args);

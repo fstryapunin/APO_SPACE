@@ -44,7 +44,7 @@ typedef struct
 typedef struct {
     GameState *state;
     Queue *input_queue;
-    bool stop;
+    bool *stop;
 } GameStateArgs;
 
 GameState init_gamestate();

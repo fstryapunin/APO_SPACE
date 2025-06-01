@@ -4,10 +4,6 @@
 #include "mzapo_parlcd.h"
 #include "font_types.h"
 
-// void render_state(int fuel, double rotation, Vector position, bool is_stopped, bool is_crashed, Planet *planets);
-// void render_map(Vector position, Planet *planets);
-// void render_menu(MenuState state);
-
 bool check_bounds(int x, int y){
     return x >= 0 && x < LCD_WIDTH && y >= 0 && y < LCD_HEIGHT;
 }
@@ -81,8 +77,9 @@ void *loop_render(RenderArgs *args){
     void *parlcd_mem_base = map_phys_address(PARLCD_REG_BASE_PHYS, PARLCD_REG_SIZE, 0);
     parlcd_hx8357_init(parlcd_mem_base);
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
-    while (!args->stop)
+    while (!*(args->stop))
     {
+
         unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
         draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
         draw_player(frame_buffer, *(args->rotation));

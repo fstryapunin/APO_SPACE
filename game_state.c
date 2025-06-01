@@ -18,7 +18,7 @@ GameState init_gamestate(){
     state.rotation_set_point = M_PI / 2;
     state.motor_power = 0;
     state.speed = (Vector){ 0, 0};
-    state.position = (Vector) {0, 102};
+    state.position = (Vector) {0, 104};
     state.player_state = LANDED;
     state.planet_count = 1;
     state.remaining_fuel = (double)FUEL_AMOUNT;
@@ -144,17 +144,9 @@ void update_gamestate(GameState *state, Queue *queue){
 void *loop_game_state(GameStateArgs *args){
     printf("Udpating at %lf, acc per update : %lf\n", UPDATE_DELAY_MS * 1000, ACCELERATION_CONSTANT);
 
-    while (!args->stop)
+    while (!*(args->stop))
     {
         update_gamestate(args->state, args->input_queue);
-
-        printf("\rState: %lf %lf %lf %lf\n", 
-            args->state->position.x, 
-            args->state->position.y, 
-            args->state->speed.x, 
-            args->state->speed.y
-        );
-
         usleep((int)(UPDATE_DELAY_MS * 1000));
     }
 

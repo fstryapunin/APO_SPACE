@@ -12,55 +12,42 @@
 #include "mzapo_regs.h"
 #include "game_state.h"
 #include "input.h"
-#include "io.h"
 #include "render.h"
+#include "queue.h"
 
 int main(int argc, char *argv[])
 {
-  unsigned char *memory_base = (unsigned char *)init_memory();
-
+  printf("Hello space!\n");
   pthread_t game_thread;
   pthread_t input_thread;
   pthread_t render_thread;
 
-  Input input = init_input(memory_base);
-  input.acceleration_input = 100;
- 
+  bool stop_game = false;
   GameState state = init_gamestate();
+  Queue input_queue = init_queue();
 
-  GameStateArgs game_state_args = { &state, &(input.acceleration_input), &(input.rotation_input), false };
-  InputArgs input_args = { &input, false, memory_base };
-  RenderArgs render_args = { 
-    &(state.remaining_fuel), 
-    &(state.rotation_radians),
-    &(state.position),
-    &(state.player_state),
-    &(state.planets),
-    &(state.planet_count),
-    &(state.nearest_planet),
-    false
+  InputArgs input_args = (InputArgs){ &input_queue, &stop_game };
+  GameStateArgs game_state_args = (GameStateArgs){ &state, &input_queue, &stop_game };
+  RenderArgs render_args = (RenderArgs){ 
+    &state.rotation_set_point,
+    &state.position,
+    &state.planets,
+    &state.planet_count,
+    &state.current_planet,
+    &stop_game
   };
 
   pthread_create(&input_thread, NULL, loop_input_collection, &input_args);
   pthread_create(&game_thread, NULL, loop_game_state, &game_state_args);
   pthread_create(&render_thread, NULL, loop_render, &render_args);
 
-  while (!input.stop)
+  while (!stop_game)
   {
-    if(input.pause_input){
-      state = init_gamestate();
-      input = init_input(memory_base);
-    }
     usleep(100);
   }
-  
 
-  game_state_args.stop = true;
-  input_args.stop = true;
-  render_args.stop = true;
-
-  pthread_join(game_thread, NULL);
   pthread_join(input_thread, NULL);
+  pthread_join(game_thread, NULL);
   pthread_join(render_thread, NULL);
 
   return 0;

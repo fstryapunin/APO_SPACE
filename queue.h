@@ -10,7 +10,8 @@ typedef enum InputEvent {
     ROTATE_RIGHT_BLUE,
     RED_KEY,
     BLUE_KEY,
-    GREEN_KEY
+    GREEN_KEY,
+    NONE
 } InputEvent;
 
 typedef struct Input {

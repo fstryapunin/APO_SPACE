@@ -98,6 +98,21 @@ void draw_indicators(unsigned short *buffer, Vector *player_position, Planet *pl
     }
 }
 
+void draw_map(unsigned short *buffer, Planet *planets, Vector *position, unsigned short *planet_count){
+    for(int planet_index = 0; planet_index < *planet_count; planet_index++){
+        Planet planet = planets[planet_index];
+        Vector planet_center_relative = subtract_vectors(planet.position, *position);
+        Vector planet_center_scaled = divide_vector_by_scalar(planet_center_relative, 200);
+
+        int offset_x = planet_center_scaled.x + LCD_CENTER_X;
+        int offset_y = planet_center_scaled.y + LCD_CENTER_Y;
+
+        draw_circle(buffer, offset_x, offset_y, 10, WHITE_COLOR);
+    }
+
+    draw_circle(buffer, LCD_CENTER_X, LCD_CENTER_Y, 3, PLAYER_COLOR);
+}
+
 void *loop_render(RenderArgs *args){
     void *parlcd_mem_base = map_phys_address(PARLCD_REG_BASE_PHYS, PARLCD_REG_SIZE, 0);
     void *spiled_mem_base = map_phys_address(SPILED_REG_BASE_PHYS, SPILED_REG_SIZE, 0);
@@ -107,12 +122,18 @@ void *loop_render(RenderArgs *args){
     while (!*(args->stop))
     {
         unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
-        draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
-        draw_player(frame_buffer, *(args->rotation));
-        draw_indicators(frame_buffer, args->position, args->planets, args->planet_count);
-        render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
+        if(*(args->show_map)){
+            draw_map(frame_buffer, args->planets, args->position, args->planet_count);
+        } else {
+            draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
+            draw_player(frame_buffer, *(args->rotation));
+            draw_indicators(frame_buffer, args->position, args->planets, args->planet_count);
+        }
+
         render_fuel_to_leds(args->remaining_fuel, spiled_mem_base);
         render_player_state(args->player_state, spiled_mem_base);
+        render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
+
         usleep(RENDER_DELAY_MS * 1000);
     }
 };

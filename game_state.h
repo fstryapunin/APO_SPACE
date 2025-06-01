@@ -31,6 +31,7 @@ typedef struct
     int current_planet;
     Planet planets[PLANET_COUNT];
     unsigned short planet_count;
+    bool show_map;
 } GameState;
 
 typedef struct {

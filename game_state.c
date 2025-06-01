@@ -23,6 +23,7 @@ GameState init_gamestate(){
     state.planet_count = PLANET_COUNT;
     state.remaining_fuel = (double)FUEL_AMOUNT;
     state.current_planet = -1;
+    state.show_map = false;
 
     return state;
 };
@@ -108,6 +109,14 @@ double get_rotation_radians(double current, InputEvent event){
     return fmod(next, 2 * M_PI);
 }
 
+bool get_show_map(GameState *state, InputEvent event){
+    if(event == GREEN_KEY){
+        return !(state->show_map);
+    }
+
+    return state->show_map;
+};
+
 void update_gamestate(GameState *state, Queue *queue){
     wait_for_queue_lock(queue);
 
@@ -119,6 +128,8 @@ void update_gamestate(GameState *state, Queue *queue){
     InputEvent input = queue->count > 0 ? dequeu_input_event(queue) : NONE;
     release_queue_lock(queue);
 
+    state->show_map = get_show_map(state, input);
+    
     if(state->player_state == CRASHED && input != RED_KEY) return;
 
 
@@ -126,8 +137,8 @@ void update_gamestate(GameState *state, Queue *queue){
         *state = init_gamestate();
         return;
     }
-
-    if(state == LANDED && (input != ROTATE_LEFT_BLUE && input != ROTATE_RIGHT_BLUE)){
+    
+    if(state->player_state == LANDED && (input != ROTATE_LEFT_BLUE && input != ROTATE_RIGHT_BLUE)){
         return;
     }
  

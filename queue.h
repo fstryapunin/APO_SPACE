@@ -3,7 +3,8 @@
 #ifndef INPUT_QUEUE
 #define INPUT_QUEUE
 
-typedef enum InputEvent {
+typedef enum InputEvent
+{
     ROTATE_LEFT_GREEN,
     ROTATE_RIGHT_GREEN,
     ROTATE_LEFT_BLUE,
@@ -14,12 +15,14 @@ typedef enum InputEvent {
     NONE
 } InputEvent;
 
-typedef struct Input {
+typedef struct Input
+{
     InputEvent event;
     struct Input *next;
 } Input;
 
-typedef struct {
+typedef struct
+{
     Input *start;
     int count;
     bool lock;

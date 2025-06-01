@@ -20,7 +20,7 @@
 #define UPDATE_DELAY_MS ((double)1 / UPDATE_FREQUENCY) * 1000
 
 // speed is defined in meters per second
-typedef struct 
+typedef struct
 {
     int motor_power;
     double rotation_set_point;
@@ -34,7 +34,8 @@ typedef struct
     bool show_map;
 } GameState;
 
-typedef struct {
+typedef struct
+{
     GameState *state;
     Queue *input_queue;
     bool *stop;

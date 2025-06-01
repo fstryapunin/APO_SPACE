@@ -2,12 +2,11 @@
 
 #ifndef VECTORS
 #define VECTORS
-typedef struct 
+typedef struct
 {
     double x;
     double y;
 } Vector;
-
 
 double get_magnitude_from_vector(Vector vector);
 double get_magnitude_from_coordinates(double x, double y);

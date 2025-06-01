@@ -1,18 +1,18 @@
 #ifndef COMON
 #define COMON
-#include <stdlib.h>
-#include <stdio.h>
+#include "vector.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <math.h>
-#include "vector.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #define PLAYER_WIDTH 2
 #define PLAYER_HEIGHT 8
 #define FUEL_AMOUNT 3200
 #define FUEL_PER_LED (FUEL_AMOUNT / 32)
 
-typedef enum PlayerState 
+typedef enum PlayerState
 {
     CRASHED = 0,
     LANDED = 1,

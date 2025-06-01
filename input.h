@@ -10,4 +10,3 @@ typedef struct
 } InputArgs;
 
 void *loop_input_collection(InputArgs *args);
-

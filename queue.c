@@ -1,6 +1,7 @@
 #include "queue.h"
 
-void enqueue_input_event(Queue *queue, InputEvent event){
+void enqueue_input_event(Queue *queue, InputEvent event)
+{
     queue->count = queue->count + 1;
 
     Input *input = malloc(sizeof(Input));
@@ -8,7 +9,8 @@ void enqueue_input_event(Queue *queue, InputEvent event){
 
     Input *last = queue->start;
 
-    if(last == NULL){
+    if (last == NULL)
+    {
         queue->start = input;
         return;
     }
@@ -16,13 +18,15 @@ void enqueue_input_event(Queue *queue, InputEvent event){
     while (last->next != NULL)
     {
         last = last->next;
-    }    
+    }
 
     last->next = input;
 };
 
-InputEvent dequeu_input_event(Queue *queue){
-    if(queue->start == NULL) return;
+InputEvent dequeu_input_event(Queue *queue)
+{
+    if (queue->start == NULL)
+        return;
 
     Input *next = queue->start;
     InputEvent event = next->event;
@@ -35,37 +39,44 @@ InputEvent dequeu_input_event(Queue *queue){
     return event;
 };
 
-Queue init_queue(){
-    return (Queue){ NULL, 0, false };
+Queue init_queue()
+{
+    return (Queue){NULL, 0, false};
 }
 
-void free_queue(Queue *queue){
+void free_queue(Queue *queue)
+{
     Input *input = queue->start;
 
     while (input != NULL)
     {
         Input *temp = input->next;
         free(input);
-        input = temp;   
+        input = temp;
     }
-    
+
     queue->count = 0;
 };
 
-bool acquire_queue_lock(Queue *queue){
-    if(queue->lock) return false;
+bool acquire_queue_lock(Queue *queue)
+{
+    if (queue->lock)
+        return false;
 
     queue->lock = true;
 
     return true;
 };
 
-void release_queue_lock(Queue *queue){
+void release_queue_lock(Queue *queue)
+{
     queue->lock = false;
 };
 
-void wait_for_queue_lock(Queue *queue){
-    while(!acquire_queue_lock(queue)){
+void wait_for_queue_lock(Queue *queue)
+{
+    while (!acquire_queue_lock(queue))
+    {
         usleep(100);
     };
 }

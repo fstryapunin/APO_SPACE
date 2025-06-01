@@ -56,20 +56,18 @@ void draw_player(unsigned short *buffer, double rotation_radians){
     }
 }
 
-void draw_nearest_planet_indicator(unsigned short *buffer, Vector *player_position, Planet *planets, int index)
-{
-    if(index < 0) return;
-    Planet planet = planets[index];
+void draw_indicators(unsigned short *buffer, Vector *player_position, Planet *planets, unsigned short *planet_count){
+    for(int planet_index = 0; planet_index < *planet_count; planet_index++){
+        Planet planet = planets[planet_index];
+        double distance = get_distance(*player_position, planet.position);
 
-    double distance = get_distance(*player_position, planet.position);
-    if(distance > 20){
-        Vector direction = subtract_vectors(planet.position, *player_position);
+        if(distance > INDICATOR_TRESHOLD){
+            Vector direction = subtract_vectors(planet.position, *player_position);
+            Vector normalized = divide_vector_by_scalar(direction, get_magnitude_from_vector(direction));
+            Vector indicator = multiply_vector_by_scalar(normalized, PIXELS_PER_METER_IN_GAME * 30);
 
-        Vector normalized = divide_vector_by_scalar(direction, get_magnitude_from_vector(direction));
-
-        Vector indicator = multiply_vector_by_scalar(normalized, PIXELS_PER_METER_IN_GAME * 15);
-
-        draw_circle(buffer, indicator.x + LCD_CENTER_X, indicator.y + LCD_CENTER_Y, 5, WHITE_COLOR);
+            draw_circle(buffer, indicator.x + LCD_CENTER_X, indicator.y + LCD_CENTER_Y, 5, WHITE_COLOR);
+        }
     }
 }
 
@@ -79,11 +77,10 @@ void *loop_render(RenderArgs *args){
     parlcd_write_cmd(parlcd_mem_base, 0x2c);
     while (!*(args->stop))
     {
-
         unsigned short frame_buffer[LCD_HEIGHT * LCD_WIDTH] = {0};
         draw_planets(frame_buffer, args->planets, *(args->planet_count), args->position);
         draw_player(frame_buffer, *(args->rotation));
-        draw_nearest_planet_indicator(frame_buffer, args->position, args->planets, *args->nearest_planet_index);
+        draw_indicators(frame_buffer, args->position, args->planets, args->planet_count);
         render_frame_buffer_to_lcd(frame_buffer, parlcd_mem_base);
         usleep(RENDER_DELAY_MS * 1000);
     }
